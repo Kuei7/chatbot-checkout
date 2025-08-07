@@ -41,7 +41,7 @@ body {
     --radius: 0.5rem;
     
     /* Custom variables for chat */
-    --chat-background: 168 26% 91%; /* #D9E8E5 */
+    --chat-background: 210 28% 12%; /* #111b21 */
     --outgoing-bubble: 102 100% 94%; /* #E1FFC7 */
     --incoming-bubble: 0 0% 100%;
     --header-background: 200 18% 10%; /* #0b141b */
