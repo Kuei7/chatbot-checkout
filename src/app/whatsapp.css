@@ -70,8 +70,6 @@
 .chat-container {
   padding-top: 75px; /* header height + padding */
   padding-bottom: 90px; /* input area height + padding */
-  background-image: url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg');
-  background-repeat: repeat;
   min-height: 100vh;
 }
 
