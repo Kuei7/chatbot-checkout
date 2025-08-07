@@ -65,6 +65,10 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        'chat-background': 'hsl(var(--chat-background))',
+        'outgoing-bubble': 'hsl(var(--outgoing-bubble))',
+        'incoming-bubble': 'hsl(var(--incoming-bubble))',
+        'header-background': 'hsl(var(--header-background))',
       },
       borderRadius: {
         lg: 'var(--radius)',

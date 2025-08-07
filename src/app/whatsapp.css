@@ -1,0 +1,120 @@
+
+.user-bar {
+  width: 100%;
+  height: 55px;
+  background: hsl(var(--header-background));
+  color: #fff;
+  padding: 0 10px;
+  font-size: 24px;
+  position: fixed;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  top: 0;
+}
+
+.user-bar .back {
+    margin-right: 10px;
+}
+
+.user-bar .avatar {
+  margin: 0 0 0 5px;
+  width: 40px;
+  height: 40px;
+}
+
+.user-bar .avatar img {
+  border-radius: 50%;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-bar .name-status {
+  margin-left: 15px;
+  flex-grow: 1;
+}
+
+.user-bar .name {
+  font-size: 17px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-bar .status {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.user-bar .actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: auto;
+}
+
+.user-bar .actions i {
+    font-size: 22px;
+}
+
+.chat-container {
+  padding-top: 75px; /* header height + padding */
+  padding-bottom: 90px; /* input area height + padding */
+  background-image: url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg');
+  background-repeat: repeat;
+  min-height: 100vh;
+}
+
+.message-bubble.bot .check-icon {
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    height: 15px;
+    width: 15px;
+}
+
+/* This is the info message about commercial account */
+.info-message-container {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.info-message {
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    background-color: #d5f4f0; 
+    border-radius: 10px; 
+    padding: 10px; 
+    width: fit-content; 
+    max-width: 90%; 
+    margin: 0.5rem auto;
+    font-size: 14px;
+    color: #53676b;
+}
+
+.action-buttons-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 20px 20px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+}
