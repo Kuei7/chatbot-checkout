@@ -36,7 +36,7 @@ export const conversationScript: ScriptItem[] = [
   { type: 'bot', contentType: 'text', content: 'Quer aprender a usar a IA para avaliar livros e ganhar dinheiro com isso?', delay: 1000 },
   { type: 'userAction', buttons: [{ text: 'SIM!', action: 'next' }], delay: 0 },
   { type: 'bot', contentType: 'text', content: 'A maioria das pessoas cobram 500 Reais ou mais para ensinar isso, e eu acho isso muito errado, por isso quero te ajudar!', delay: 3000 },
-  { type: 'bot', contentType: 'text', content: 'Mas vou liberar apenas 20 vagas, espero que você seja uma das pessoas que vai lucrar mais de 30 mil por mês.', delay: 3000 },
+  { type: 'bot', contentType: 'text', content: 'Mas vou liberar apenas 20 vagas, espero que você seja uma das pessoas que vai lucrar mais de 10 mil por mês.', delay: 3000 },
   { type: 'bot', contentType: 'text', content: 'Eu so te peço uma coisa! quando lucrar me mande um print mostrando os seus ganhos ok?', delay: 4000 },
   { type: 'userAction', buttons: [{ text: 'OK!', action: 'next' }], delay: 0 },
   { type: 'bot', contentType: 'text', content: 'Vou te passar o Link, espero que te ajude daqui para frente este conhecimento!', delay: 1000 },
