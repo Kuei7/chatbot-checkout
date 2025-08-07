@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { conversationScript, type DisplayMessage, type ScriptItem } from '@/lib/conversation';
 import WhatsappHeader from '@/components/whatsapp-chat/WhatsappHeader';
 import ChatMessages from '@/components/whatsapp-chat/ChatMessages';
@@ -12,6 +12,13 @@ export default function Home() {
     const [currentStep, setCurrentStep] = useState(0);
     const [status, setStatus] = useState('Online');
     const [activeButtons, setActiveButtons] = useState<ScriptItem['buttons']>([]);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages, activeButtons]);
 
     useEffect(() => {
         if (currentStep >= conversationScript.length) {
@@ -85,12 +92,12 @@ export default function Home() {
             }}
         >
             <WhatsappHeader status={status} />
-            <div className="chat-container flex flex-col flex-1">
+            <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto">
                 <ChatMessages messages={messages} />
+                {activeButtons.length > 0 && (
+                    <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
+                )}
             </div>
-            {activeButtons.length > 0 && (
-                <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
-            )}
         </main>
     );
 }

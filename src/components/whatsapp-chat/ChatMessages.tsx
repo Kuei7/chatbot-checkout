@@ -68,16 +68,8 @@ const InfoMessage: FC = () => (
 
 
 const ChatMessages: FC<{ messages: DisplayMessage[] }> = ({ messages }) => {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
-
     return (
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 p-4 space-y-4">
             <InfoMessage />
             <AnimatePresence>
                 {messages.map((msg) => (
@@ -86,7 +78,6 @@ const ChatMessages: FC<{ messages: DisplayMessage[] }> = ({ messages }) => {
                     </div>
                 ))}
             </AnimatePresence>
-            <div ref={scrollRef} />
         </div>
     );
 };
