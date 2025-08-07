@@ -76,7 +76,14 @@ export default function Home() {
     };
 
     return (
-        <main className="flex flex-col h-screen max-h-screen bg-chat-background overflow-hidden">
+        <main 
+            className="flex flex-col h-screen max-h-screen bg-chat-background overflow-hidden"
+            style={{ 
+                backgroundImage: 'url(https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/rmkt86vk7r985fy1ekip6xvp?v=1754527793735)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
             <WhatsappHeader status={status} />
             <div className="chat-container flex flex-col flex-1">
                 <ChatMessages messages={messages} />
