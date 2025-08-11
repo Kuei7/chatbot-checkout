@@ -108,7 +108,7 @@ export default function Home() {
         <main 
             className="flex flex-col h-screen max-h-screen overflow-hidden"
             style={{ 
-                backgroundColor: 'hsl(215 15% 9%)',
+                backgroundImage: 'url(https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/rmkt86vk7r985fy1ekip6xvp?v=1754527793735)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             }}
