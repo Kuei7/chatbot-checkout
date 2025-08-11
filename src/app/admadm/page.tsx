@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -17,51 +18,70 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Calendar, ChevronDown, MoreHorizontal } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { format } from 'date-fns';
 
-const funnelData = [
-  {
-    submittedAt: '10 de ago., 21:05',
-    group2: 'Sim!',
-    group6: 'Ok!',
-    group6_1: 'Quero o link!',
-    group6_2: null,
-    group7: null,
-    pixel: null,
-    nome: null,
-  },
-  {
-    submittedAt: '10 de ago., 20:45',
-    group2: 'Sim!',
-    group6: 'Ok!',
-    group6_1: null,
-    group6_2: null,
-    group7: null,
-    pixel: null,
-    nome: null,
-  },
-  {
-    submittedAt: '10 de ago., 19:30',
-    group2: 'Sim!',
-    group6: 'Ok!',
-    group6_1: 'Quero o link!',
-    group6_2: 'Comprado',
-    group7: null,
-    pixel: '12345',
-    nome: 'João',
-  },
-  {
-    submittedAt: '09 de ago., 11:15',
-    group2: 'Sim!',
-    group6: null,
-    group6_1: null,
-    group6_2: null,
-    group7: null,
-    pixel: null,
-    nome: null,
-  },
-];
+interface FunnelData {
+  id: string;
+  submittedAt: string;
+  group2: string | null;
+  group6: string | null;
+  group6_1: string | null;
+  group6_2: string | null;
+  group7: string | null;
+  pixel: string | null;
+  nome: string | null;
+}
+
+async function getFunnelData(): Promise<FunnelData[]> {
+    const leadsCollection = collection(db, 'leads');
+    const q = query(leadsCollection, orderBy('submittedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    const data: FunnelData[] = [];
+    querySnapshot.forEach((doc) => {
+        const docData = doc.data();
+        data.push({
+            id: doc.id,
+            submittedAt: docData.submittedAt ? format(docData.submittedAt.toDate(), "dd 'de' MMM, HH:mm") : '',
+            group2: docData.group2 || null,
+            group6: docData.group6 || null,
+            group6_1: docData.group6_1 || null,
+            group6_2: docData.group6_2 || null,
+            group7: docData.group7 || null,
+            pixel: docData.pixel || null,
+            nome: docData.nome || null,
+        });
+    });
+    return data;
+}
+
 
 export default function AdminDashboard() {
+  const [funnelData, setFunnelData] = useState<FunnelData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getFunnelData()
+        .then(data => {
+            setFunnelData(data);
+            setLoading(false);
+        })
+        .catch(error => {
+            console.error("Error fetching funnel data: ", error);
+            setLoading(false);
+        });
+  }, []);
+
+  if (loading) {
+      return (
+        <div className="dark bg-gray-900 text-white min-h-screen p-8 font-sans flex items-center justify-center">
+            <p>Carregando dados...</p>
+        </div>
+      )
+  }
+
   return (
     <div className="dark bg-gray-900 text-white min-h-screen p-8 font-sans">
       <header className="flex justify-end items-center mb-6">
@@ -104,8 +124,8 @@ export default function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {funnelData.map((row, index) => (
-                <TableRow key={index} className="border-gray-700 hover:bg-gray-800/50">
+              {funnelData.map((row) => (
+                <TableRow key={row.id} className="border-gray-700 hover:bg-gray-800/50">
                   <TableCell>
                     <Checkbox />
                   </TableCell>

@@ -6,6 +6,19 @@ import { conversationScript, type DisplayMessage, type ScriptItem } from '@/lib/
 import WhatsappHeader from '@/components/whatsapp-chat/WhatsappHeader';
 import ChatMessages from '@/components/whatsapp-chat/ChatMessages';
 import ActionButtons from '@/components/whatsapp-chat/ActionButtons';
+import { updateLeadProgress } from '@/services/leadService';
+import { v4 as uuidv4 } from 'uuid';
+
+
+const getUserId = () => {
+  if (typeof window === 'undefined') return null;
+  let userId = localStorage.getItem('userId');
+  if (!userId) {
+    userId = uuidv4();
+    localStorage.setItem('userId', userId);
+  }
+  return userId;
+}
 
 export default function Home() {
     const [messages, setMessages] = useState<DisplayMessage[]>([]);
@@ -13,6 +26,11 @@ export default function Home() {
     const [status, setStatus] = useState('Online');
     const [activeButtons, setActiveButtons] = useState<ScriptItem['buttons']>([]);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const userIdRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        userIdRef.current = getUserId();
+    }, []);
 
     useEffect(() => {
         if (chatContainerRef.current) {
@@ -64,6 +82,10 @@ export default function Home() {
     }, [currentStep]);
 
     const handleButtonClick = (button: NonNullable<ScriptItem['buttons']>[0]) => {
+        if (userIdRef.current && button.progressStep) {
+            updateLeadProgress(userIdRef.current, button.progressStep, button.text);
+        }
+        
         if (button.action === 'redirect' && button.url) {
             window.location.href = button.url;
             return;
@@ -84,20 +106,20 @@ export default function Home() {
 
     return (
         <main 
-            className="flex flex-col h-screen max-h-screen bg-chat-background overflow-hidden"
+            className="flex flex-col h-screen max-h-screen overflow-hidden"
             style={{ 
-                backgroundImage: 'url(https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/rmkt86vk7r985fy1ekip6xvp?v=1754527793735)',
+                backgroundColor: 'hsl(215 15% 9%)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             }}
         >
             <WhatsappHeader status={status} />
-            <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto">
+            <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto pb-4">
                 <ChatMessages messages={messages} />
-                {activeButtons.length > 0 && (
-                    <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
-                )}
             </div>
+            {activeButtons.length > 0 && (
+                <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
+            )}
         </main>
     );
 }
