@@ -15,7 +15,7 @@ const WhatsappHeader: FC<WhatsappHeaderProps> = ({ status }) => {
         <i className="zmdi zmdi-arrow-left"></i>
       </div>
       <div className="avatar">
-        <Image src="https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/cmeqkb6ac0007ji04gxy4m02s/blocks/sialpdmv41oc2ta3u7q2qqnh?v=1756728283650" alt="Avatar" width={40} height={40} data-ai-hint="man portrait"/>
+        <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/fmyy7qeuts05fb5e4ib5ti92?v=1761032795978" alt="Avatar" width={40} height={40} data-ai-hint="woman portrait"/>
       </div>
       <div className="name-status">
         <div className="name">
