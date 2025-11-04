@@ -36,7 +36,7 @@ export const conversationScript: ScriptItem[] = [
   { type: 'userAction', buttons: [{ text: 'SIM!', action: 'next' }], delay: 1000 },
   { type: 'bot', contentType: 'text', content: 'Boa! olha so o quanto eu já ganhei esse mês:', delay: 1000 },
   { type: 'bot', contentType: 'image', content: 'https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/gjhqhj4btid6v6yruv93csdx?v=1754525162592', delay: 3000 },
-  { type: 'bot', contentType: 'text', content: 'Quer aprender a usar a IA para avaliar livros e ganhar dinheiro com isso?', delay: 1000 },
+  { type: 'bot', contentType: 'text', content: 'E aí, vamos garantir essa tranquilidade financeira pra passar o fim de ano com a conta cheia?', delay: 1000 },
   { type: 'userAction', buttons: [{ text: 'SIM!', action: 'next' }], delay: 0 },
   { type: 'bot', contentType: 'text', content: 'A maioria das pessoas cobram 500 Reais ou mais para ensinar isso, e eu acho isso muito errado, por isso quero te ajudar!', delay: 3000 },
   { type: 'bot', contentType: 'text', content: 'Mas vou liberar apenas 20 vagas, espero que você seja uma das pessoas que vai lucrar mais de 10 mil por mês.', delay: 3000 },
