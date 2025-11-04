@@ -33,9 +33,10 @@ const ChatBubble: FC<{ message: DisplayMessage }> = ({ message }) => {
             className={cn('message-bubble relative max-w-[80%] md:max-w-[65%] w-fit px-3 py-2 rounded-lg shadow-sm', bubbleClass, isBot ? 'bot' : 'user')}
         >
             {message.type === 'text' && (
-                <p className="text-gray-800 whitespace-pre-wrap">
-                    {message.content}
-                </p>
+                 <p 
+                    className="text-gray-800 whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: message.content }}
+                />
             )}
             {message.type === 'image' && (
                 <Image 
