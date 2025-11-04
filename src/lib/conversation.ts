@@ -39,7 +39,7 @@ export const conversationScript: ScriptItem[] = [
   { type: 'bot', contentType: 'text', content: 'E aí, vamos garantir essa tranquilidade financeira pra passar o fim de ano com a conta cheia?', delay: 1000 },
   { type: 'userAction', buttons: [{ text: 'SIM!', action: 'next' }], delay: 0 },
   { type: 'bot', contentType: 'text', content: 'Sabe o que é foda? O fim de ano sempre batia a tristeza. Eu queria ir pra festa, queria ajudar minha mãe... mas a carteira vazia não deixava.', delay: 3000 },
-  { type: 'bot', contentType: 'text', content: 'Só que isso mudou depois que descobri esse método da IA. E, justamente por ter passado por isso, <b>EU NÃO</b> vou cobrar <del>R$ 500</del> pra te mostrar.', delay: 3000 },
+  { type: 'bot', contentType: 'text', content: 'Só que isso mudou depois que descobri esse método da IA. E, justamente por ter passado por isso, <b>EU NÃO</b> vou cobrar <del>R$ 500</del> pra te mostrar esse segredo igual a muitos outros.', delay: 3000 },
   { type: 'bot', contentType: 'text', content: 'Mas tem um detalhe: vou liberar só 20 acessos com essa condição, porque preciso dar atenção. Se for pra mudar de vida, tem que ser agora.', delay: 4000 },
   { type: 'userAction', buttons: [{ text: 'OK!', action: 'next', progressStep: 'group6' }], delay: 0 },
   { type: 'bot', contentType: 'text', content: 'Vou te passar o Link, espero que te ajude daqui para frente este conhecimento!', delay: 1000 },
