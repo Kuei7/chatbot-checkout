@@ -32,7 +32,7 @@ export const conversationScript: ScriptItem[] = [
   { type: 'bot', contentType: 'text', content: 'Olha so as pessoas que lucraram! 👀', delay: 4000 },
   { type: 'bot', contentType: 'image', content: 'https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/kpl9g7swn8djdqjdkekzyzio?v=1754525037643', delay: 3000 },
   { type: 'bot', contentType: 'image', content: 'https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/anu0bvj2od8ecns1bg72k70l?v=1754525040395', delay: 3000 },
-  { type: 'bot', contentType: 'text', content: 'Eai, Quer aprender a ganhar mais de 500 por dia utilizando apenas uma IA?', delay: 3000 },
+  { type: 'bot', contentType: 'text', content: 'Eai, Quer aprender a ganhar mais de R$500 por dia apenas utilizando uma IA?', delay: 3000 },
   { type: 'userAction', buttons: [{ text: 'SIM!', action: 'next' }], delay: 1000 },
   { type: 'bot', contentType: 'text', content: 'Boa! olha so o quanto eu já ganhei esse mês:', delay: 1000 },
   { type: 'bot', contentType: 'image', content: 'https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/gjhqhj4btid6v6yruv93csdx?v=1754525162592', delay: 3000 },
