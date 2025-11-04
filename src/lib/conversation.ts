@@ -42,6 +42,6 @@ export const conversationScript: ScriptItem[] = [
   { type: 'bot', contentType: 'text', content: 'Só que isso mudou depois que descobri esse método da IA. E, justamente por ter passado por isso, <b>EU NÃO</b> vou cobrar <del>R$ 500</del> pra te mostrar esse segredo igual a muitos outros.', delay: 3000 },
   { type: 'bot', contentType: 'text', content: 'Mas tem um detalhe: vou liberar só 20 acessos! porque preciso dar atenção. Se for pra mudar de vida, tem que ser agora.', delay: 4000 },
   { type: 'userAction', buttons: [{ text: 'Quero aprender com você!', action: 'next', progressStep: 'group6' }], delay: 0 },
-  { type: 'bot', contentType: 'text', content: 'Vou te passar o Link, espero que te ajude daqui para frente este conhecimento!', delay: 1000 },
+  { type: 'bot', contentType: 'text', content: 'Eu so te peço uma coisa, quando lucrar me mande print por favor ok?', delay: 1000 },
   { type: 'userAction', buttons: [{ text: 'Quero o link!', action: 'redirect', url: 'https://go.pepperpay.com.br/0qvu6', progressStep: 'group6_1' }], delay: 1000 },
 ];
