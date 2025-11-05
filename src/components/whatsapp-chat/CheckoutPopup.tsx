@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Lock, Copy } from 'lucide-react';
+import { X, Lock, Copy, Check } from 'lucide-react';
 import Image from 'next/image';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -27,31 +26,39 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
             onClick={() => onCheckedChange(!isChecked)}
             className={cn(
                 "bg-gray-800/50 rounded-xl p-4 border-2 transition-all cursor-pointer",
-                isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-transparent hover:border-accent/50'
+                isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-gray-700 hover:border-accent/50'
             )}
         >
             <div className="flex items-start">
-                <div 
-                    className={cn(
-                        "relative flex items-center justify-center shrink-0 w-5 h-5 mt-1 border-2 rounded transition-all",
-                        isChecked ? 'bg-accent border-accent' : 'bg-transparent border-accent'
-                    )}
-                >
-                    {isChecked && <Check className="w-4 h-4 text-gray-900" />}
+                <div className="relative flex items-center shrink-0 w-5 h-5 mt-1">
+                    <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => onCheckedChange(e.target.checked)}
+                        className="opacity-0 absolute w-full h-full cursor-pointer"
+                    />
+                    <div 
+                        className={cn(
+                            "flex items-center justify-center w-5 h-5 border-2 rounded transition-all",
+                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-accent'
+                        )}
+                    >
+                        {isChecked && <Check className="w-4 h-4 text-gray-900" />}
+                    </div>
                 </div>
 
                 <div className="ml-4 flex-1">
-                     <div className="flex justify-between items-center mb-1">
-                        <div className="flex flex-col">
+                     <div className="flex justify-between items-start mb-2">
+                        <div className="flex flex-col mr-2">
                            <span className="text-accent text-sm font-bold">Sim, eu quero!</span>
-                           <span className="text-white font-bold text-base leading-tight">{bump.title}</span>
+                           <span className="text-white font-semibold text-[1.05rem] leading-tight">{bump.title}</span>
                         </div>
-                        <p className="font-bold text-base text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
+                        <p className="font-bold text-lg text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
 
                     {bump.description && (
                         <div className={cn(
-                            "text-xs text-gray-400 pl-0 mt-2 pt-2", 
+                            "text-xs text-gray-400 pl-0 mt-2 pt-2",
                             bump.id === 'bump1' ? 'border-t border-dashed border-gray-700' : 'border-t-0'
                         )}>
                             {bump.description}
@@ -247,5 +254,3 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
 };
 
 export default CheckoutPopup;
-
-    
