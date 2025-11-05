@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, Lock, Copy } from 'lucide-react';
@@ -31,21 +31,28 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
             )}
         >
             <div className="flex items-start">
-                <Checkbox
-                    id={bump.id}
-                    checked={isChecked}
-                    onCheckedChange={onCheckedChange}
-                    className="mt-1 size-5 rounded border-2 border-accent data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground shrink-0"
-                />
-                <div className="ml-3 flex-1">
-                    <div className="flex justify-between items-baseline mb-1">
-                        <p className="font-bold text-base text-white">{bump.title}</p>
+                <div 
+                    className={cn(
+                        "relative flex items-center justify-center shrink-0 w-5 h-5 mt-1 border-2 rounded transition-all",
+                        isChecked ? 'bg-accent border-accent' : 'bg-transparent border-accent'
+                    )}
+                >
+                    {isChecked && <Check className="w-4 h-4 text-gray-900" />}
+                </div>
+
+                <div className="ml-4 flex-1">
+                     <div className="flex justify-between items-center mb-1">
+                        <div className="flex flex-col">
+                           <span className="text-accent text-sm font-bold">Sim, eu quero!</span>
+                           <span className="text-white font-bold text-base leading-tight">{bump.title}</span>
+                        </div>
                         <p className="font-bold text-base text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
-                     {bump.description && (
+
+                    {bump.description && (
                         <div className={cn(
-                            "text-xs text-gray-400 pl-[2px]", 
-                            bump.id === 'bump1' ? 'mt-2 pt-2 border-t border-dashed border-gray-700' : 'mt-1'
+                            "text-xs text-gray-400 pl-0 mt-2 pt-2", 
+                            bump.id === 'bump1' ? 'border-t border-dashed border-gray-700' : 'border-t-0'
                         )}>
                             {bump.description}
                         </div>
@@ -56,46 +63,62 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
     );
 };
 
-
 const PixDisplay: React.FC<{onClose: () => void, pixKey: string, totalPrice: number}> = ({onClose, pixKey, totalPrice}) => {
     const { toast } = useToast();
+    const [expiration, setExpiration] = useState('');
+
+    useEffect(() => {
+        const expirationDate = new Date(Date.now() + 5 * 60 * 1000);
+        const formattedDate = new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }).format(expirationDate).replace(',', '');
+        setExpiration(formattedDate);
+    }, []);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(pixKey);
         toast({
-            title: "Chave PIX copiada!",
-            description: "Agora você pode colar no seu app do banco.",
+            title: "Copiado!",
+            description: "Chave PIX copiada para a área de transferência.",
+            className: "bg-accent text-accent-foreground border-0"
         });
     }
 
     return (
-        <div className="text-center p-6 flex flex-col items-center">
-            <h2 className="text-xl font-bold text-accent mb-2">Pague com PIX para liberar seu acesso!</h2>
-            <p className="text-gray-400 text-sm mb-4">Escaneie o QR Code ou copie a chave abaixo.</p>
-            <div className="p-2 bg-white rounded-lg">
-                <Image src="https://i.postimg.cc/L8p5g3j2/qr-code-pix.png" alt="PIX QR Code" width={200} height={200} data-ai-hint="QR code" />
+        <div className="text-center p-6 flex flex-col items-center bg-gray-900">
+            <h2 className="text-xl font-bold text-white mb-4">Pagamento via PIX</h2>
+            
+            <div className="p-2 bg-white rounded-lg inline-block">
+                <Image src="https://i.postimg.cc/L8p5g3j2/qr-code-pix.png" alt="PIX QR Code" width={180} height={180} data-ai-hint="QR code" />
             </div>
-            <p className="text-gray-400 mt-4 text-sm">Valor: <span className="font-bold text-white">R$ {totalPrice.toFixed(2).replace('.', ',')}</span></p>
 
             <div className="w-full mt-6">
-                <p className="text-xs text-gray-400 mb-1">PIX Copia e Cola:</p>
-                <div className="relative">
-                    <Input 
-                        type="text" 
-                        readOnly 
-                        value={pixKey}
-                        className="bg-gray-700 border-gray-600 text-white pr-10 truncate"
-                    />
-                    <Button variant="ghost" size="icon" onClick={handleCopy} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-white">
-                        <Copy size={16} />
-                    </Button>
-                </div>
+                <Input 
+                    type="text" 
+                    readOnly 
+                    value={pixKey}
+                    className="bg-gray-800 border-gray-700 text-white pr-4 truncate text-center font-mono"
+                />
             </div>
-            <div className="mt-6 text-xs text-gray-400 bg-gray-800/50 p-3 rounded-lg">
-                <p>Após o pagamento, o seu acesso será enviado para o e-mail cadastrado.</p>
+            <Button onClick={handleCopy} className="mt-3 w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
+                <Copy size={16} className="mr-2" />
+                Copiar código PIX
+            </Button>
+
+            <div className="text-sm text-gray-400 mt-4 space-y-1">
+                <p>💰 Valor: <strong className="text-white">R$ {totalPrice.toFixed(2).replace('.', ',')}</strong></p>
+                <p>🕒 Válido até: <span className="text-white">{expiration}</span></p>
             </div>
-            <Button onClick={onClose} className="mt-6 w-full bg-accent/80 hover:bg-accent/70">
-                Já fiz o pagamento!
+
+            <p className="mt-4 font-bold text-accent text-sm">Pagamento seguro via PIX</p>
+            
+            <Button onClick={onClose} variant="link" className="mt-2 text-gray-400 hover:text-white">
+                Finalizar
             </Button>
         </div>
     )
@@ -224,3 +247,5 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
 };
 
 export default CheckoutPopup;
+
+    
