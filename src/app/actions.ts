@@ -20,6 +20,11 @@ export type State = {
   } | null;
 };
 
+const orderBumpsConfig: { [key: string]: number } = {
+    'offer_5a507a2745a74e57': 1990, // Acesso a todos os métodos (R$ 19,90)
+    'offer_f8435d836371c19b': 990   // Acesso vitalício (R$ 9,90)
+};
+
 export async function processPayment(prevState: State, formData: FormData): Promise<State> {
   
   const rawFormData = {
@@ -38,16 +43,28 @@ export async function processPayment(prevState: State, formData: FormData): Prom
   
   const { email, orderbump } = validatedFields.data;
 
+  // Calculate total amount
+  let totalAmount = paymentConfig.baseAmount;
+  const validOrderBumps: string[] = [];
+  if (orderbump) {
+      orderbump.forEach(hash => {
+          if(orderBumpsConfig[hash]) {
+              totalAmount += orderBumpsConfig[hash];
+              validOrderBumps.push(hash);
+          }
+      });
+  }
+
   const payload = {
-      amount: paymentConfig.baseAmount,
+      amount: totalAmount, // Use the calculated total amount
       description: paymentConfig.productTitle,
       productHash: paymentConfig.productHash,
       customer: {
           name: email.split('@')[0], 
           email: email,
       },
-      checkoutUrl: 'https://app.com/checkout', // This should be the real checkout URL
-      orderbump: orderbump,
+      checkoutUrl: 'https://app.com/checkout', 
+      orderbump: validOrderBumps,
   };
 
   try {
