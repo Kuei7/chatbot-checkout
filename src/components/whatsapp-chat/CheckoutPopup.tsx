@@ -1,9 +1,8 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useFormState } from 'react-dom';
-import { X, Lock } from 'lucide-react';
+import { useEffect, useState, useRef, useActionState } from 'react';
+import { X, Lock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -60,18 +59,18 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                 </div>
 
                 <div className="flex-1">
-                     <div className="flex justify-between items-start gap-3">
+                     <div className="flex justify-between items-center gap-3">
                         <div className="flex flex-col">
                            <span className="text-accent font-semibold text-xs leading-tight">{bump.title}</span>
-                           <span className="text-white font-bold text-sm leading-tight mt-1">{bump.subtitle}</span>
+                           <span className="text-white font-bold text-base leading-tight mt-1">{bump.subtitle}</span>
                         </div>
-                        <p className="font-bold text-base text-accent whitespace-nowrap">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
+                        <p className="font-bold text-lg text-accent whitespace-nowrap">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
 
                     {bump.description && (
                         <div className={cn(
                             "text-xs text-gray-400 pl-0 mt-3 pt-3",
-                             'border-t border-dashed border-gray-700'
+                            bump.id === 'bump1' && 'border-t border-dashed border-gray-700'
                         )}>
                             {bump.description}
                         </div>
@@ -87,9 +86,10 @@ const CheckoutForm: React.FC<{
     onBumpsChange: (bumps: string[]) => void;
     selectedBumps: string[];
     totalPrice: number;
-}> = ({ onBumpsChange, selectedBumps, totalPrice }) => {
+    onPaymentSuccess: () => void;
+}> = ({ onBumpsChange, selectedBumps, totalPrice, onPaymentSuccess }) => {
 
-    const [state, formAction] = useFormState(processPayment, initialState);
+    const [state, formAction] = useActionState(processPayment, initialState);
     const [isPixModalOpen, setPixModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
@@ -160,6 +160,7 @@ const CheckoutForm: React.FC<{
                 <PixModal 
                     pixData={state.pixData}
                     onClose={() => setPixModalOpen(false)}
+                    onPaymentSuccess={onPaymentSuccess}
                 />
             )}
         </>
@@ -197,7 +198,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailS
                         <div className="flex items-center justify-center space-x-4">
                             <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Rico com IA" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                             <div>
-                                <h3 className="font-bold text-lg text-white">Rico com IA</h3>
+                                <h3 className="font-bold text-lg text-white">Metodo IA (GANHE 10K POR MÊS)</h3>
                                 <p className="text-2xl font-bold text-accent">R$ {basePrice.toFixed(2).replace('.',',')}</p>
                             </div>
                         </div>
@@ -207,6 +208,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailS
                         selectedBumps={selectedBumps}
                         onBumpsChange={setSelectedBumps}
                         totalPrice={totalPrice}
+                        onPaymentSuccess={onPaymentSuccess}
                     />
 
                     <div className="mt-4 text-center text-gray-500 text-xs flex items-center justify-center gap-2">
@@ -220,3 +222,5 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailS
 };
 
 export default CheckoutPopup;
+
+    
