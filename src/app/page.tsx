@@ -8,8 +8,6 @@ import ChatMessages from '@/components/whatsapp-chat/ChatMessages';
 import ActionButtons from '@/components/whatsapp-chat/ActionButtons';
 import { updateLeadProgress } from '@/services/leadService';
 import { v4 as uuidv4 } from 'uuid';
-import CheckoutPopup from '@/components/whatsapp-chat/CheckoutPopup';
-
 
 const getUserId = () => {
   if (typeof window === 'undefined') return null;
@@ -26,7 +24,6 @@ export default function Home() {
     const [currentStep, setCurrentStep] = useState(0);
     const [status, setStatus] = useState('Online');
     const [activeButtons, setActiveButtons] = useState<ScriptItem['buttons']>([]);
-    const [isCheckoutOpen, setCheckoutOpen] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const userIdRef = useRef<string | null>(null);
 
@@ -94,7 +91,8 @@ export default function Home() {
         }
         
         if (button.action === 'checkout') {
-            setCheckoutOpen(true);
+            // Redirect to the old link instead of opening the checkout
+            window.location.href = 'https://go.pepperpay.com.br/0qvu6';
             return;
         }
 
@@ -110,24 +108,6 @@ export default function Home() {
         setActiveButtons([]);
         setCurrentStep((prev) => prev + 1);
     };
-    
-    const handleCheckoutSubmit = (email: string) => {
-        if(userIdRef.current) {
-            updateLeadProgress(userIdRef.current, 'group7', email);
-        }
-        console.log('Lead registered with email:', email);
-    };
-
-    const handleCheckoutClose = () => {
-        setCheckoutOpen(false);
-    }
-
-    const handleFinalRedirect = () => {
-        // This function is called after the Pix Modal is closed
-        // or after payment confirmation.
-        window.location.href = 'https://go.pepperpay.com.br/0qvu6';
-    }
-
 
     return (
         <>
@@ -139,7 +119,7 @@ export default function Home() {
                     backgroundPosition: 'center',
                 }}
             >
-                <WhatsappHeader status={status} onPhoneClick={() => setCheckoutOpen(true)} />
+                <WhatsappHeader status={status} />
                 <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto pb-4">
                     <ChatMessages messages={messages} />
                 </div>
@@ -147,12 +127,6 @@ export default function Home() {
                     <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
                 )}
             </main>
-            <CheckoutPopup 
-                isOpen={isCheckoutOpen} 
-                onClose={handleCheckoutClose}
-                onEmailSubmit={handleCheckoutSubmit}
-                onPaymentSuccess={handleFinalRedirect}
-            />
         </>
     );
 }
