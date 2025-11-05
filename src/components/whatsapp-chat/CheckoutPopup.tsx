@@ -66,7 +66,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
             
             <div className="p-6 overflow-y-auto">
                 <div className="text-center mb-6">
-                    <p className="text-sm text-gray-400 mb-2">VOCÊ ESTÁ ADQUIRINDO:</p>
+                    <p className="text-sm text-gray-400 mb-2">GARANTA O SEU ACESSO:</p>
                     <div className="flex items-center justify-center space-x-4">
                         <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Chapeu Preto" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                         <div>
