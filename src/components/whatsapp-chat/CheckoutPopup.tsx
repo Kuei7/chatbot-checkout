@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
 
 interface CheckoutPopupProps {
   isOpen: boolean;
