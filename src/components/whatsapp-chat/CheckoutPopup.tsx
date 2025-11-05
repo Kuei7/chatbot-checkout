@@ -26,34 +26,34 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
     return (
         <div
             onClick={() => onCheckedChange(!isChecked)}
-            className={cn(
+             className={cn(
                 "bg-gray-800/50 rounded-xl p-4 border-2 transition-all cursor-pointer",
                 isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-gray-700 hover:border-accent/50'
             )}
         >
             <div className="flex items-start">
-                <div className="relative flex items-center shrink-0 w-5 h-5 mt-1">
-                    <input
+                <div className="relative flex items-center shrink-0 w-5 h-5 mt-1 mr-4">
+                     <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={(e) => onCheckedChange(e.target.checked)}
                         className="opacity-0 absolute w-full h-full cursor-pointer"
                     />
-                    <div 
+                    <div
                         className={cn(
                             "flex items-center justify-center w-5 h-5 border-2 rounded transition-all",
-                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-accent'
+                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-gray-500 group-hover:border-accent'
                         )}
                     >
                         {isChecked && <Check className="w-4 h-4 text-gray-900" />}
                     </div>
                 </div>
 
-                <div className="ml-4 flex-1">
+                <div className="flex-1">
                      <div className="flex justify-between items-start mb-2">
                         <div className="flex flex-col mr-2">
                            <span className="text-accent text-sm font-bold">Sim, eu quero!</span>
-                           <span className="text-white font-semibold text-[1.05rem] leading-tight">{bump.title}</span>
+                           <span className="text-white font-semibold text-base leading-tight">{bump.title}</span>
                         </div>
                         <p className="font-bold text-lg text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
@@ -61,7 +61,7 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                     {bump.description && (
                         <div className={cn(
                             "text-xs text-gray-400 pl-0 mt-2 pt-2",
-                            bump.id === 'bump1' ? 'border-t border-dashed border-gray-700' : 'border-t-0'
+                             'border-t border-dashed border-gray-700'
                         )}>
                             {bump.description}
                         </div>
@@ -194,9 +194,9 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                     <div className="text-center mb-6">
                         <p className="text-sm text-gray-400 mb-2">GARANTA O SEU ACESSO:</p>
                         <div className="flex items-center justify-center space-x-4">
-                            <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Chapeu Preto" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
+                            <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Rico com IA" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                             <div>
-                                <h3 className="font-bold text-lg text-white">Metodo IA (GANHE 10K POR MÊS)</h3>
+                                <h3 className="font-bold text-lg text-white">Rico com IA</h3>
                                 <p className="text-2xl font-bold text-accent">R$ {basePrice.toFixed(2).replace('.',',')}</p>
                             </div>
                         </div>
