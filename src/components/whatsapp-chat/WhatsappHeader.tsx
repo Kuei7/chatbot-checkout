@@ -6,9 +6,10 @@ import Image from 'next/image';
 
 interface WhatsappHeaderProps {
   status: string;
+  onPhoneClick?: () => void;
 }
 
-const WhatsappHeader: FC<WhatsappHeaderProps> = ({ status }) => {
+const WhatsappHeader: FC<WhatsappHeaderProps> = ({ status, onPhoneClick }) => {
   return (
     <header className="user-bar">
       <div className="back">
@@ -29,7 +30,7 @@ const WhatsappHeader: FC<WhatsappHeaderProps> = ({ status }) => {
       </div>
       <div className="actions">
         <i className="zmdi zmdi-videocam"></i>
-        <i className="zmdi zmdi-phone"></i>
+        <i className="zmdi zmdi-phone" onClick={onPhoneClick}></i>
         <i className="zmdi zmdi-more-vert"></i>
       </div>
     </header>

@@ -134,7 +134,7 @@ export default function Home() {
                     backgroundPosition: 'center',
                 }}
             >
-                <WhatsappHeader status={status} />
+                <WhatsappHeader status={status} onPhoneClick={() => setCheckoutOpen(true)} />
                 <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto pb-4">
                     <ChatMessages messages={messages} />
                 </div>
