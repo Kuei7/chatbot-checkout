@@ -78,7 +78,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="bg-incoming-bubble p-5 rounded-lg">
+                    <div className="p-5 rounded-lg bg-gray-800/50">
                         <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
                         <div className="space-y-4">
                              <div>
@@ -92,7 +92,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                     <div className="space-y-3">
                         <p className="text-center font-semibold">Turbine sua compra com um <span className="text-accent">desconto exclusivo</span>:</p>
                         {orderBumps.map(bump => (
-                            <div key={bump.id} className="bg-incoming-bubble border-2 border-dashed border-gray-700 rounded-lg p-3 flex items-start gap-3 has-[:checked]:border-accent transition-all">
+                            <div key={bump.id} className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-3 flex items-start gap-3 has-[:checked]:border-accent transition-all">
                                 <Checkbox id={bump.id} onCheckedChange={() => handleBumpChange(bump.id)} className="mt-1 size-5 border-gray-500 data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground data-[state=checked]:border-accent" />
                                 <Label htmlFor={bump.id} className="flex-1 cursor-pointer">
                                     <div className="flex justify-between items-center">
