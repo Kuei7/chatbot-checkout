@@ -116,13 +116,13 @@ export default function Home() {
             updateLeadProgress(userIdRef.current, 'group7', email);
         }
         console.log('Checkout submitted with email:', email);
-        // Here you would typically handle the payment processing
-        
-        // For demonstration, redirect after "payment"
-        setTimeout(() => {
-            window.location.href = 'https://go.pepperpay.com.br/0qvu6';
-        }, 1000);
     };
+
+    const handleCheckoutClose = () => {
+        setCheckoutOpen(false);
+        // Redirect after closing the final pix screen
+        window.location.href = 'https://go.pepperpay.com.br/0qvu6';
+    }
 
     return (
         <>
@@ -144,7 +144,7 @@ export default function Home() {
             </main>
             <CheckoutPopup 
                 isOpen={isCheckoutOpen} 
-                onClose={() => setCheckoutOpen(false)}
+                onClose={handleCheckoutClose}
                 onSubmit={handleCheckoutSubmit}
             />
         </>
