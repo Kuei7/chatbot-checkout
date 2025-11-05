@@ -91,8 +91,8 @@ export default function Home() {
         }
         
         if (button.action === 'checkout') {
-            // Redirect to the old link instead of opening the checkout
-            window.location.href = 'https://go.pepperpay.com.br/0qvu6';
+            // Redirect to the new link
+            window.location.href = 'https://compraseguraonline.org.ua/c/e46e1cac04';
             return;
         }
 
