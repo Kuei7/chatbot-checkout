@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { X, Lock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +48,7 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                     onChange={(e) => onCheckedChange(e.target.checked)}
                     className="opacity-0 absolute w-0 h-0"
                 />
-                <div className="relative flex items-center justify-center shrink-0 w-5 h-5 mt-1 mr-4">
+                 <div className="relative flex items-center justify-center shrink-0 w-5 h-5 mt-1 mr-4">
                     <div
                         className={cn(
                             "flex items-center justify-center w-5 h-5 border-2 rounded-md transition-all",
@@ -57,7 +58,7 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                         {isChecked && <Check className="w-4 h-4 text-gray-900" />}
                     </div>
                 </div>
-
+                
                 <div className="flex-1">
                      <div className="flex justify-between items-center gap-3">
                         <div className="flex flex-col">
@@ -81,6 +82,20 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
     );
 };
 
+const SubmitButton = () => {
+    const { pending } = useFormStatus();
+
+    return (
+        <Button type="submit" disabled={pending} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
+            {pending ? (
+                <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    PROCESSANDO...
+                </>
+            ) : 'COMPRAR AGORA'}
+        </Button>
+    );
+};
 
 const CheckoutForm: React.FC<{
     onBumpsChange: (bumps: string[]) => void;
@@ -91,28 +106,16 @@ const CheckoutForm: React.FC<{
 
     const [state, formAction] = useActionState(processPayment, initialState);
     const [isPixModalOpen, setPixModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const formRef = useRef<HTMLFormElement>(null);
     
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsLoading(true);
-        const formData = new FormData(event.currentTarget);
-        formAction(formData);
-    }
-
     useEffect(() => {
         if (state.pixData) {
             setPixModalOpen(true);
-        }
-        if (state.error || state.pixData) {
-            setIsLoading(false);
         }
     }, [state]);
 
     return (
         <>
-            <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-6">
+            <form action={formAction} className="space-y-6">
                 <div className="bg-gray-800/50 rounded-lg p-5">
                     <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
                     <div className="space-y-4">
@@ -135,6 +138,22 @@ const CheckoutForm: React.FC<{
                                     ? [...selectedBumps, bump.offerHash]
                                     : selectedBumps.filter(hash => hash !== bump.offerHash);
                                 onBumpsChange(newBumps);
+                                // This is a hidden input to pass the bumps to the server action
+                                const form = document.querySelector('form');
+                                if (form) {
+                                    // Remove existing hidden inputs to avoid duplicates
+                                    form.querySelectorAll('input[name="orderbump"]').forEach(el => {
+                                        if(el.getAttribute('type') === 'hidden') el.remove()
+                                    });
+                                    // Add new hidden inputs
+                                    newBumps.forEach(bumpHash => {
+                                        const input = document.createElement('input');
+                                        input.type = 'hidden';
+                                        input.name = 'orderbump';
+                                        input.value = bumpHash;
+                                        form.appendChild(input);
+                                    });
+                                }
                             }}
                     />
                     ))}
@@ -145,14 +164,7 @@ const CheckoutForm: React.FC<{
                         <span className="font-semibold">Valor total:</span>
                         <span className="font-bold text-accent text-2xl">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
                     </div>
-                    <Button type="submit" disabled={isLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
-                    {isLoading ? (
-                        <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                            PROCESSANDO...
-                        </>
-                    ) : 'COMPRAR AGORA'}
-                    </Button>
+                    <SubmitButton />
                      {state.error && <p className="text-red-400 text-sm mt-2 text-center">{state.error}</p>}
                 </div>
             </form>
@@ -194,7 +206,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailS
                 
                 <div className="p-6 overflow-y-auto">
                     <div className="text-center mb-6">
-                        <p className="text-sm text-gray-400 mb-2">GARANTA O SEU ACESSO:</p>
+                        <p className="text-sm text-gray-400 mb-2 uppercase">GARANTA O SEU ACESSO:</p>
                         <div className="flex items-center justify-center space-x-4">
                             <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Rico com IA" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                             <div>
@@ -222,5 +234,3 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailS
 };
 
 export default CheckoutPopup;
-
-    
