@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, PlusCircle } from 'lucide-react';
+import { X, User, CreditCard, ShoppingCart, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -21,9 +21,13 @@ const orderBumps = [
 
 const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit }) => {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [cpf, setCpf] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState('pix');
+
 
   if (!isOpen) {
     return null;
@@ -48,6 +52,14 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
       setError('Por favor, insira um e-mail válido.');
       return;
     }
+     if (!name) {
+      setError('Por favor, insira seu nome completo.');
+      return;
+    }
+    if (!cpf) {
+        setError('Por favor, insira seu CPF.');
+        return;
+    }
     setError('');
     setIsLoading(true);
     // Simulate API call
@@ -58,87 +70,102 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-secondary rounded-lg shadow-2xl w-full max-w-sm mx-auto text-foreground relative animate-in fade-in zoom-in-95">
-        <button onClick={onClose} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors">
-          <X size={24} />
-        </button>
-        
-        <header className="bg-header-background text-center py-4 rounded-t-lg">
-          <h2 className="text-lg font-semibold text-primary-foreground">Compra Segura e Rápida</h2>
-        </header>
-
-        <div className="p-6">
-            <p className="text-sm text-muted-foreground font-medium mb-4">Você está adquirindo:</p>
-            <div className="flex items-center space-x-4 mb-6">
-                <Image src="https://i.postimg.cc/5jdp32QJ/Icone-Azul-Diamantado.png" alt="Metodo IA" width={64} height={64} className="rounded-lg border-2 border-border p-1" data-ai-hint="logo abstract"/>
-                <div>
-                    <h3 className="font-bold text-lg">Metodo IA</h3>
-                    <p className="text-xl font-semibold text-primary">R$ 19,90</p>
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2">
+        <div className="bg-gray-900 rounded-lg shadow-2xl w-full max-w-md mx-auto text-gray-200 relative animate-in fade-in zoom-in-95 max-h-[95vh] flex flex-col">
+            <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-white transition-colors z-10">
+            <X size={24} />
+            </button>
+            
+            <div className="p-6 overflow-y-auto">
+                {/* Product Info */}
+                <div className="text-center mb-6">
+                    <p className="text-sm text-gray-400 mb-2">VOCÊ ESTÁ ADQUIRINDO:</p>
+                    <div className="flex items-center justify-center space-x-4">
+                        <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Chapeu Preto" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
+                        <div>
+                            <h3 className="font-bold text-lg text-white">Chapéu Preto (10k por mês)</h3>
+                            <p className="text-2xl font-bold text-green-400">3x R$ 7,22</p>
+                            <p className="text-xs text-gray-400">Ou R$ 19,90 à vista</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-             {/* Order Bumps */}
-            <div className="space-y-3 mb-6">
-                {orderBumps.map(bump => (
-                    <div key={bump.id} className="bg-background/30 border border-border rounded-lg p-3 flex items-center gap-3 has-[:checked]:border-primary has-[:checked]:bg-primary/10 transition-all">
-                        <Checkbox 
-                            id={bump.id} 
-                            onCheckedChange={() => handleBumpChange(bump.id)}
-                            className="size-5"
-                        />
-                        <Label htmlFor={bump.id} className="flex-1 cursor-pointer">
-                            <div className="flex justify-between items-center">
-                                <span className="font-semibold">{bump.title}</span>
-                                <span className="font-bold text-primary">+ R$ {bump.price.toFixed(2).replace('.',',')}</span>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Personal Data */}
+                    <div className="bg-gray-800/50 p-5 rounded-lg">
+                        <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-green-500 text-gray-900 rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
+                        <div className="space-y-4">
+                             <div>
+                                <Label htmlFor="name" className="text-xs font-medium text-gray-400">NOME COMPLETO</Label>
+                                <Input type="text" id="name" name="name" required value={name} onChange={(e) => setName(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">{bump.description}</p>
-                        </Label>
+                            <div>
+                                <Label htmlFor="email" className="text-xs font-medium text-gray-400">SEU E-MAIL</Label>
+                                <Input type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
+                            </div>
+                            <div>
+                                <Label htmlFor="cpf" className="text-xs font-medium text-gray-400">CPF</Label>
+                                <Input type="text" id="cpf" name="cpf" required value={cpf} onChange={(e) => setCpf(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
+                            </div>
+                        </div>
                     </div>
-                ))}
-            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <Label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-1">E-mail</Label>
-                    <Input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="seu@email.com"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 bg-input border-border focus:outline-none focus:ring-2 focus:ring-primary transition rounded-lg text-foreground"
-                    />
-                    {error && <p className="text-destructive text-xs mt-2">{error}</p>}
-                </div>
-                
-                <div className="border-t border-dashed border-border pt-4 mt-4">
-                    <div className="flex justify-between items-center text-lg">
-                        <span className="font-semibold">Total:</span>
-                        <span className="font-bold text-primary">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
+                    {/* Payment Data */}
+                    <div className="bg-gray-800/50 p-5 rounded-lg">
+                        <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-green-500 text-gray-900 rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">2</span> DADOS DE PAGAMENTO</h3>
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                            <Button type="button" onClick={() => setPaymentMethod('pix')} variant={paymentMethod === 'pix' ? 'secondary' : 'ghost'} className="data-[state=active]:bg-green-500 data-[state=active]:text-white bg-gray-700 hover:bg-gray-600">PIX</Button>
+                            <Button type="button" onClick={() => setPaymentMethod('card')} variant={paymentMethod === 'card' ? 'secondary' : 'ghost'} className="data-[state=active]:bg-green-500 data-[state=active]:text-white bg-gray-700 hover:bg-gray-600">Cartão de Crédito</Button>
+                        </div>
+                        {paymentMethod === 'pix' && <p className="text-sm text-center text-gray-400">O pagamento será via PIX. Clique em "COMPRAR AGORA" para gerar o código.</p>}
+                        {paymentMethod === 'card' && <p className="text-sm text-center text-gray-400">Funcionalidade de cartão de crédito em breve.</p>}
                     </div>
+                    
+                    {/* Order Bumps */}
+                    <div className="space-y-3">
+                        <p className="text-center font-semibold">Adicione mais estes produtos com um <span className="text-green-400">desconto imperdível</span>:</p>
+                        {orderBumps.map(bump => (
+                            <div key={bump.id} className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-3 flex items-start gap-3 has-[:checked]:border-green-500 transition-all">
+                                <Checkbox id={bump.id} onCheckedChange={() => handleBumpChange(bump.id)} className="mt-1 size-5 border-gray-500 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" />
+                                <Label htmlFor={bump.id} className="flex-1 cursor-pointer">
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold text-red-500">Sim, eu quero!</span>
+                                        <span className="font-bold text-green-400">+ R$ {bump.price.toFixed(2).replace('.',',')}</span>
+                                    </div>
+                                    <p className="font-bold text-white">{bump.title}</p>
+                                    <p className="text-xs text-gray-400 mt-1">{bump.description}</p>
+                                </Label>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Total & Submit */}
+                    <div className="border-t border-dashed border-gray-700 pt-4 mt-6">
+                        <div className="flex justify-between items-center text-lg mb-4">
+                            <span className="font-semibold">Valor total:</span>
+                            <span className="font-bold text-green-400">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
+                        </div>
+                        <Button type="submit" disabled={isLoading} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
+                        {isLoading ? (
+                            <>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                PROCESSANDO...
+                            </>
+                        ) : 'COMPRAR AGORA'}
+                        </Button>
+                    </div>
+                </form>
+
+                <div className="mt-4 text-center text-gray-500 text-xs flex items-center justify-center gap-2">
+                    <Lock size={12} />
+                    <span>Ambiente criptografado e 100% seguro.</span>
                 </div>
-
-                <Button type="submit" disabled={isLoading} className="w-full p-4 bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg uppercase rounded-lg transition-all flex items-center justify-center">
-                   {isLoading ? (
-                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                        Processando...
-                       </>
-                   ) : 'PAGAR AGORA'}
-                </Button>
-            </form>
-
-            <div className="mt-4 text-center text-muted-foreground text-sm">
-                <p>Pagamento seguro via <strong>PIX</strong> com aprovação imediata.</p>
             </div>
-             <p className="text-center text-xs text-muted-foreground/70 mt-6">Compra 100% segura. Reembolso garantido em até 7 dias.</p>
         </div>
-      </div>
     </div>
   );
 };
 
 export default CheckoutPopup;
+
+    
