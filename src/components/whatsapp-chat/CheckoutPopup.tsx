@@ -7,6 +7,7 @@ import { X, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 interface CheckoutPopupProps {
   isOpen: boolean;
@@ -18,6 +19,42 @@ const orderBumps = [
     { id: 'bump1', title: 'Acesso a todos os métodos de ganhar dinheiro', price: 19.90, description: 'Aqui eu vou liberar todos os metodos que eu conheço de ganhar dinheiro na internet, e você vai receber todos os que lançarem daqui para frente tambem' },
     { id: 'bump2', title: 'Acesso vitalício!', price: 9.90, description: 'Receba acesso vitalício ao método.' }
 ];
+
+const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: (checked: boolean) => void }> = ({ bump, isChecked, onCheckedChange }) => {
+    return (
+        <div
+            onClick={() => onCheckedChange(!isChecked)}
+            className={cn(
+                "bg-gray-800/50 rounded-xl p-4 border-2 transition-all cursor-pointer",
+                isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-transparent hover:border-accent/50'
+            )}
+        >
+            <div className="flex items-start">
+                <Checkbox
+                    id={bump.id}
+                    checked={isChecked}
+                    onCheckedChange={onCheckedChange}
+                    className="mt-1 size-5 rounded border-2 border-accent data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground shrink-0"
+                />
+                <div className="ml-3 flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                        <div>
+                            <p className="text-sm font-semibold text-accent">Sim, eu quero!</p>
+                            <p className="font-bold text-base text-white">{bump.title}</p>
+                        </div>
+                        <p className="font-bold text-base text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
+                    </div>
+                    {bump.description && (
+                        <div className={cn("text-xs text-gray-400", bump.id === 'bump1' && 'mt-1 pt-1 border-t border-dashed border-gray-700')}>
+                            {bump.description}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit }) => {
   const [email, setEmail] = useState('');
@@ -90,37 +127,14 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                     
                     <div className="space-y-4">
                         <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">Opções Exclusivas</h3>
-                        {orderBumps.map((bump, index) => {
-                            const isChecked = selectedBumps.includes(bump.id);
-                            return (
-                                <Label 
-                                    key={bump.id} 
-                                    htmlFor={bump.id}
-                                    className={`block bg-gray-800/50 rounded-xl p-5 border-2 transition-all cursor-pointer ${isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-transparent hover:border-accent/50'}`}
-                                >
-                                    <div className="flex items-start">
-                                        <Checkbox 
-                                            id={bump.id} 
-                                            checked={isChecked}
-                                            onCheckedChange={(checked) => handleBumpChange(bump.id, checked as boolean)} 
-                                            className="mt-1 size-5 rounded border-2 border-accent data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground" 
-                                        />
-                                        <div className="ml-4 flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <p className="font-semibold text-accent">Sim, eu quero!</p>
-                                                    <p className="font-bold text-lg text-white">{bump.title}</p>
-                                                </div>
-                                                <p className="font-bold text-xl text-accent whitespace-nowrap ml-2">+ R$ {bump.price.toFixed(2).replace('.',',')}</p>
-                                            </div>
-                                             <div className={`mt-2 pt-2 text-sm text-gray-400 ${index === 0 ? 'border-t border-dashed border-gray-700' : ''}`}>
-                                                {bump.description}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Label>
-                            )
-                        })}
+                        {orderBumps.map((bump) => (
+                           <OrderBumpCard
+                                key={bump.id}
+                                bump={bump}
+                                isChecked={selectedBumps.includes(bump.id)}
+                                onCheckedChange={(checked) => handleBumpChange(bump.id, checked)}
+                           />
+                        ))}
                     </div>
 
                     <div className="border-t border-dashed border-gray-700 pt-4 mt-6">
