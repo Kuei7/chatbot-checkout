@@ -88,14 +88,6 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                             </div>
                         </div>
                     </div>
-
-                    <div className="bg-incoming-bubble p-5 rounded-lg">
-                        <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">2</span> PAGAMENTO</h3>
-                        <div className="bg-gray-700 p-4 rounded-md text-center">
-                            <p className="font-semibold text-white">Pagamento via PIX</p>
-                            <p className="text-sm text-gray-400">Clique em "COMPRAR AGORA" para gerar o código PIX.</p>
-                        </div>
-                    </div>
                     
                     <div className="space-y-3">
                         <p className="text-center font-semibold">Turbine sua compra com um <span className="text-accent">desconto exclusivo</span>:</p>
