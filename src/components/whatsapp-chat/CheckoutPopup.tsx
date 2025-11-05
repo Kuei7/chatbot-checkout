@@ -1,19 +1,27 @@
 
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
+import { useFormState } from 'react-dom';
+import { X, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Lock, Copy, Check } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { Label } from '@/components/ui/label';
-import QRCode from 'react-qr-code';
+import { processPayment } from '@/app/actions';
+import PixModal from '@/components/whatsapp-chat/PixModal';
+
+const initialState = {
+  pixData: null,
+  error: null,
+};
 
 interface CheckoutPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (email: string) => void;
+  onEmailSubmit: (email: string) => void;
+  onPaymentSuccess: () => void;
 }
 
 const orderBumps = [
@@ -26,18 +34,21 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
         <div
             onClick={() => onCheckedChange(!isChecked)}
             className={cn(
-                "bg-[#2C2C40] rounded-xl p-5 border-2 transition-all cursor-pointer",
+                "bg-[#2C2C40] rounded-xl p-4 border-2 transition-all cursor-pointer",
                 isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-[#444466] hover:border-accent/50'
             )}
         >
             <div className="flex items-start">
-                <div className="relative flex items-center shrink-0 w-6 h-6 mt-1 mr-4">
-                    <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={(e) => onCheckedChange(e.target.checked)}
-                        className="opacity-0 absolute w-full h-full cursor-pointer"
-                    />
+                 <input
+                    type="checkbox"
+                    id={bump.id}
+                    name="orderbump"
+                    value={bump.offerHash}
+                    checked={isChecked}
+                    onChange={(e) => onCheckedChange(e.target.checked)}
+                    className="opacity-0 absolute w-0 h-0"
+                />
+                <div className="relative flex items-center justify-center shrink-0 w-5 h-5 mt-1 mr-4">
                     <div
                         className={cn(
                             "flex items-center justify-center w-5 h-5 border-2 rounded-md transition-all",
@@ -49,17 +60,17 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                 </div>
 
                 <div className="flex-1">
-                     <div className="flex justify-between items-start mb-2">
-                        <div className="flex flex-col mr-2">
-                           <span className="text-accent font-semibold text-sm leading-tight">{bump.title}</span>
-                           <span className="text-white font-bold text-base leading-tight mt-1">{bump.subtitle}</span>
+                     <div className="flex justify-between items-start gap-3">
+                        <div className="flex flex-col">
+                           <span className="text-accent font-semibold text-xs leading-tight">{bump.title}</span>
+                           <span className="text-white font-bold text-sm leading-tight mt-1">{bump.subtitle}</span>
                         </div>
-                        <p className="font-bold text-lg text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
+                        <p className="font-bold text-base text-accent whitespace-nowrap">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
 
                     {bump.description && (
                         <div className={cn(
-                            "text-sm text-gray-400 pl-0 mt-3 pt-3",
+                            "text-xs text-gray-400 pl-0 mt-3 pt-3",
                              'border-t border-dashed border-gray-700'
                         )}>
                             {bump.description}
@@ -71,176 +82,115 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
     );
 };
 
-const PixDisplay: React.FC<{onClose: () => void, pixKey: string, totalPrice: number}> = ({onClose, pixKey, totalPrice}) => {
-    const { toast } = useToast();
-    const [expiration, setExpiration] = useState('');
+
+const CheckoutForm: React.FC<{
+    onBumpsChange: (bumps: string[]) => void;
+    selectedBumps: string[];
+    totalPrice: number;
+}> = ({ onBumpsChange, selectedBumps, totalPrice }) => {
+
+    const [state, formAction] = useFormState(processPayment, initialState);
+    const [isPixModalOpen, setPixModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
+    
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setIsLoading(true);
+        const formData = new FormData(event.currentTarget);
+        formAction(formData);
+    }
 
     useEffect(() => {
-        const expirationDate = new Date(Date.now() + 5 * 60 * 1000);
-        const formattedDate = new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        }).format(expirationDate).replace(',', '');
-        setExpiration(formattedDate);
-    }, []);
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(pixKey);
-        toast({
-            title: "Copiado!",
-            description: "Chave PIX copiada para a área de transferência.",
-            className: "bg-accent text-accent-foreground border-0"
-        });
-    }
+        if (state.pixData) {
+            setPixModalOpen(true);
+        }
+        if (state.error || state.pixData) {
+            setIsLoading(false);
+        }
+    }, [state]);
 
     return (
-        <div className="text-center p-6 flex flex-col items-center bg-gray-900">
-            <h2 className="text-xl font-bold text-white mb-4">Pagamento via PIX</h2>
-            
-            <div style={{ background: 'white', padding: '16px', borderRadius: '8px' }}>
-                {pixKey ? <QRCode value={pixKey} size={150} /> : <div className="w-[150px] h-[150px] bg-gray-300 animate-pulse rounded-md" />}
-            </div>
+        <>
+            <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-6">
+                <div className="bg-gray-800/50 rounded-lg p-5">
+                    <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="email" className="text-xs font-medium text-gray-400">SEU MELHOR E-MAIL</Label>
+                            <Input type="email" id="email" name="email" required className="bg-gray-700 border-gray-600 text-white" />
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="space-y-4">
+                    <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">OPÇÕES EXCLUSIVAS</h3>
+                    {orderBumps.map((bump) => (
+                    <OrderBumpCard
+                            key={bump.id}
+                            bump={bump}
+                            isChecked={selectedBumps.includes(bump.offerHash)}
+                            onCheckedChange={(checked) => {
+                                const newBumps = checked 
+                                    ? [...selectedBumps, bump.offerHash]
+                                    : selectedBumps.filter(hash => hash !== bump.offerHash);
+                                onBumpsChange(newBumps);
+                            }}
+                    />
+                    ))}
+                </div>
 
-            <div className="w-full mt-6">
-                <Input 
-                    type="text" 
-                    readOnly 
-                    value={pixKey}
-                    className="bg-gray-800 border-gray-700 text-white pr-4 truncate text-center font-mono"
-                    placeholder="Gerando código pix..."
+                <div className="border-t border-dashed border-gray-700 pt-4 mt-6">
+                    <div className="flex justify-between items-center text-lg mb-4">
+                        <span className="font-semibold">Valor total:</span>
+                        <span className="font-bold text-accent text-2xl">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
+                    </div>
+                    <Button type="submit" disabled={isLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
+                    {isLoading ? (
+                        <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                            PROCESSANDO...
+                        </>
+                    ) : 'COMPRAR AGORA'}
+                    </Button>
+                     {state.error && <p className="text-red-400 text-sm mt-2 text-center">{state.error}</p>}
+                </div>
+            </form>
+             {isPixModalOpen && state.pixData && (
+                <PixModal 
+                    pixData={state.pixData}
+                    onClose={() => setPixModalOpen(false)}
                 />
-            </div>
-            <Button onClick={handleCopy} className="mt-3 w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
-                <Copy size={16} className="mr-2" />
-                Copiar código PIX
-            </Button>
-
-            <div className="text-sm text-gray-400 mt-4 space-y-1">
-                <p>💰 Valor: <strong className="text-white">R$ {totalPrice.toFixed(2).replace('.', ',')}</strong></p>
-                <p>🕒 Válido até: <span className="text-white">{expiration}</span></p>
-            </div>
-
-            <p className="mt-4 font-bold text-accent text-sm">Pagamento seguro via PIX</p>
-            
-            <Button onClick={onClose} variant="link" className="mt-2 text-gray-400 hover:text-white">
-                Finalizar
-            </Button>
-        </div>
-    )
-}
-
-
-const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
-  const [view, setView] = useState<'form' | 'pix'>('form');
-  const [pixKey, setPixKey] = useState('');
-
-  const API_TOKEN = 'sk_a689a20c480aee9372486cfc6ed7c349ecd7951ce3129f0236adff9a31ee42c7';
-  const PRODUCT_HASH = 'prod_d91a61115c52766b';
-  const API_URL = 'https://multi.paradisepags.com/api/v1/transaction.php';
-
-  if (!isOpen) {
-    return null;
-  }
-  
-  const basePrice = 19.90;
-  const totalBumpsPrice = selectedBumps.reduce((total, bumpId) => {
-    const bump = orderBumps.find(b => b.id === bumpId);
-    return total + (bump ? bump.price : 0);
-  }, 0);
-  const totalPrice = basePrice + totalBumpsPrice;
-
-  const handleBumpChange = (bumpId: string, checked: boolean) => {
-    setSelectedBumps(prev => 
-      checked ? [...prev, bumpId] : prev.filter(id => id !== bumpId)
+            )}
+        </>
     );
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setError('Por favor, insira um e-mail válido.');
-      return;
-    }
-    setError('');
-    setIsLoading(true);
-    setView('pix');
+};
 
-    const bumpsToSend = selectedBumps.map(bumpId => {
-        const bump = orderBumps.find(b => b.id === bumpId);
-        return bump?.offerHash;
-    }).filter(Boolean) as string[];
 
-    const payload = {
-        amount: Math.round(basePrice * 100),
-        description: 'Rico com IA',
-        productHash: PRODUCT_HASH,
-        customer: {
-            name: email.split('@')[0], 
-            email: email,
-        },
-        checkoutUrl: window.location.href,
-        orderbump: bumpsToSend,
+const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onEmailSubmit, onPaymentSuccess }) => {
+    const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
+
+    if (!isOpen) return null;
+
+    const basePrice = 19.90;
+    const totalBumpsPrice = selectedBumps.reduce((total, bumpHash) => {
+        const bump = orderBumps.find(b => b.offerHash === bumpHash);
+        return total + (bump ? bump.price : 0);
+    }, 0);
+    const totalPrice = basePrice + totalBumpsPrice;
+
+    const handleClose = () => {
+        setSelectedBumps([]);
+        onClose();
     };
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-API-Key': API_TOKEN,
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        const result = await response.json();
-
-        if (!response.ok) {
-            console.error('API Error Response:', result);
-            throw new Error(result.message || 'Falha ao gerar o PIX.');
-        }
-
-        if (result?.pix?.pix_qr_code) {
-            setPixKey(result.pix.pix_qr_code);
-            onSubmit(email);
-        } else {
-            throw new Error('QR Code PIX não retornado pela API.');
-        }
-
-    } catch (apiError: any) {
-        console.error('API Error:', apiError);
-        setError(apiError.message || 'Não foi possível processar seu pagamento. Tente novamente.');
-        setView('form'); // Go back to form on error
-    } finally {
-        setIsLoading(false);
-    }
-  };
-
-  const handleClose = () => {
-      setView('form');
-      setPixKey('');
-      setEmail('');
-      setError('');
-      setSelectedBumps([]);
-      onClose();
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2">
-        <div className="bg-header-background rounded-lg shadow-2xl w-full max-w-md mx-auto text-gray-200 relative animate-in fade-in zoom-in-95 max-h-[95vh] flex flex-col">
-            <button onClick={handleClose} className="absolute top-3 right-3 text-gray-500 hover:text-white transition-colors z-10">
-                <X size={24} />
-            </button>
-            
-            {view === 'form' ? (
+    
+    return (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2">
+            <div className="bg-header-background rounded-lg shadow-2xl w-full max-w-md mx-auto text-gray-200 relative animate-in fade-in zoom-in-95 max-h-[95vh] flex flex-col">
+                <button onClick={handleClose} className="absolute top-3 right-3 text-gray-500 hover:text-white transition-colors z-10">
+                    <X size={24} />
+                </button>
+                
                 <div className="p-6 overflow-y-auto">
                     <div className="text-center mb-6">
                         <p className="text-sm text-gray-400 mb-2">GARANTA O SEU ACESSO:</p>
@@ -253,58 +203,20 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="bg-gray-800/50 rounded-lg p-5">
-                            <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="email" className="text-xs font-medium text-gray-400">SEU MELHOR E-MAIL</Label>
-                                    <Input type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
-                                    {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                            <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">OPÇÕES EXCLUSIVAS</h3>
-                            {orderBumps.map((bump) => (
-                            <OrderBumpCard
-                                    key={bump.id}
-                                    bump={bump}
-                                    isChecked={selectedBumps.includes(bump.id)}
-                                    onCheckedChange={(checked) => handleBumpChange(bump.id, checked)}
-                            />
-                            ))}
-                        </div>
-
-                        <div className="border-t border-dashed border-gray-700 pt-4 mt-6">
-                            <div className="flex justify-between items-center text-lg mb-4">
-                                <span className="font-semibold">Valor total:</span>
-                                <span className="font-bold text-accent text-2xl">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
-                            </div>
-                            <Button type="submit" disabled={isLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
-                            {isLoading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                                    PROCESSANDO...
-                                </>
-                            ) : 'COMPRAR AGORA'}
-                            </Button>
-                             {error && <p className="text-red-400 text-sm mt-2 text-center">{error}</p>}
-                        </div>
-                    </form>
+                    <CheckoutForm 
+                        selectedBumps={selectedBumps}
+                        onBumpsChange={setSelectedBumps}
+                        totalPrice={totalPrice}
+                    />
 
                     <div className="mt-4 text-center text-gray-500 text-xs flex items-center justify-center gap-2">
                         <Lock size={12} />
                         <span>Ambiente criptografado e 100% seguro.</span>
                     </div>
                 </div>
-            ) : (
-                <PixDisplay onClose={handleClose} pixKey={pixKey} totalPrice={totalPrice} />
-            )}
+            </div>
         </div>
-    </div>
-  );
+    );
 };
 
 export default CheckoutPopup;

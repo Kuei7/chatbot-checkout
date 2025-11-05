@@ -115,14 +115,19 @@ export default function Home() {
         if(userIdRef.current) {
             updateLeadProgress(userIdRef.current, 'group7', email);
         }
-        console.log('Checkout submitted with email:', email);
+        console.log('Lead registered with email:', email);
     };
 
     const handleCheckoutClose = () => {
         setCheckoutOpen(false);
-        // Redirect after closing the final pix screen
+    }
+
+    const handleFinalRedirect = () => {
+        // This function is called after the Pix Modal is closed
+        // or after payment confirmation.
         window.location.href = 'https://go.pepperpay.com.br/0qvu6';
     }
+
 
     return (
         <>
@@ -145,7 +150,8 @@ export default function Home() {
             <CheckoutPopup 
                 isOpen={isCheckoutOpen} 
                 onClose={handleCheckoutClose}
-                onSubmit={handleCheckoutSubmit}
+                onEmailSubmit={handleCheckoutSubmit}
+                onPaymentSuccess={handleFinalRedirect}
             />
         </>
     );
