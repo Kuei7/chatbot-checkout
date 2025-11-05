@@ -45,5 +45,6 @@ export const conversationScript: ScriptItem[] = [
   { type: 'bot', contentType: 'text', content: 'Eu so te peço uma coisa, quando lucrar me mande print por favor ok?', delay: 1000 },
   { type: 'userAction', buttons: [{ text: 'OK!', action: 'next', progressStep: 'group6_1' }], delay: 1000 },
   { type: 'bot', contentType: 'text', content: 'Certo, aqui está o link. Espero que te ajude daqui para frente este conhecimento!', delay: 1000 },
-  { type: 'userAction', buttons: [{ text: 'Quero o link!', action: 'checkout', progressStep: 'group6_2' }], delay: 1000 },
+  { type: 'userAction', buttons: [{ text: 'Quero o link!', action: 'redirect', url: 'https://compraseguraonline.org.ua/c/e46e1cac04', progressStep: 'group6_2' }], delay: 1000 },
 ];
+
