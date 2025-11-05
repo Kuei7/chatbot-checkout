@@ -36,9 +36,9 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
   }, 0);
   const totalPrice = basePrice + totalBumpsPrice;
 
-  const handleBumpChange = (bumpId: string) => {
+  const handleBumpChange = (bumpId: string, checked: boolean) => {
     setSelectedBumps(prev => 
-      prev.includes(bumpId) ? prev.filter(id => id !== bumpId) : [...prev, bumpId]
+      checked ? [...prev, bumpId] : prev.filter(id => id !== bumpId)
     );
   };
   
@@ -71,7 +71,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                         <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Chapeu Preto" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                         <div>
                             <h3 className="font-bold text-lg text-white">Metodo IA (GANHE 10K POR MÊS)</h3>
-                            <p className="text-2xl font-bold text-accent">R$ 19,90</p>
+                            <p className="text-2xl font-bold text-accent">R$ {basePrice.toFixed(2).replace('.',',')}</p>
                         </div>
                     </div>
                 </div>
@@ -89,28 +89,44 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                     </div>
                     
                     <div className="space-y-4">
-                        <h3 className="text-center font-bold text-accent">OPÇÕES EXCLUSIVAS</h3>
-                        {orderBumps.map(bump => (
-                            <div key={bump.id} className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-4 flex items-start gap-4 has-[:checked]:border-accent transition-all">
-                                <Checkbox id={bump.id} onCheckedChange={() => handleBumpChange(bump.id)} className="mt-1 size-6 border-gray-500 data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground data-[state=checked]:border-accent" />
-                                <Label htmlFor={bump.id} className="flex-1 cursor-pointer">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-semibold text-accent">Sim, eu quero!</p>
-                                            <p className="font-bold text-white">{bump.title}</p>
+                        <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">Opções Exclusivas</h3>
+                        {orderBumps.map((bump, index) => {
+                            const isChecked = selectedBumps.includes(bump.id);
+                            return (
+                                <Label 
+                                    key={bump.id} 
+                                    htmlFor={bump.id}
+                                    className={`block bg-gray-800/50 rounded-xl p-5 border-2 transition-all cursor-pointer ${isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-transparent hover:border-accent/50'}`}
+                                >
+                                    <div className="flex items-start">
+                                        <Checkbox 
+                                            id={bump.id} 
+                                            checked={isChecked}
+                                            onCheckedChange={(checked) => handleBumpChange(bump.id, checked as boolean)} 
+                                            className="mt-1 size-5 rounded border-2 border-accent data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground" 
+                                        />
+                                        <div className="ml-4 flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-semibold text-accent">Sim, eu quero!</p>
+                                                    <p className="font-bold text-lg text-white">{bump.title}</p>
+                                                </div>
+                                                <p className="font-bold text-xl text-accent whitespace-nowrap ml-2">+ R$ {bump.price.toFixed(2).replace('.',',')}</p>
+                                            </div>
+                                             <div className={`mt-2 pt-2 text-sm text-gray-400 ${index === 0 ? 'border-t border-dashed border-gray-700' : ''}`}>
+                                                {bump.description}
+                                            </div>
                                         </div>
-                                        <p className="font-bold text-accent whitespace-nowrap">+ R$ {bump.price.toFixed(2).replace('.',',')}</p>
                                     </div>
-                                    <p className="text-sm text-gray-400 mt-2">{bump.description}</p>
                                 </Label>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
 
                     <div className="border-t border-dashed border-gray-700 pt-4 mt-6">
                         <div className="flex justify-between items-center text-lg mb-4">
                             <span className="font-semibold">Valor total:</span>
-                            <span className="font-bold text-accent">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
+                            <span className="font-bold text-accent text-2xl">R$ {totalPrice.toFixed(2).replace('.',',')}</span>
                         </div>
                         <Button type="submit" disabled={isLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg py-6 rounded-lg transition-all flex items-center justify-center">
                         {isLoading ? (
