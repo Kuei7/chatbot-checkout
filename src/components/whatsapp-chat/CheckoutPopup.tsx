@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import QRCode from 'react-qr-code';
 
-
 interface CheckoutPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,14 +25,14 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
     return (
         <div
             onClick={() => onCheckedChange(!isChecked)}
-             className={cn(
+            className={cn(
                 "bg-gray-800/50 rounded-xl p-4 border-2 transition-all cursor-pointer",
                 isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-gray-700 hover:border-accent/50'
             )}
         >
             <div className="flex items-start">
-                <div className="relative flex items-center shrink-0 w-5 h-5 mt-1 mr-4">
-                     <input
+                <div className="relative flex items-center shrink-0 w-6 h-6 mt-1 mr-4">
+                    <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={(e) => onCheckedChange(e.target.checked)}
@@ -41,8 +40,8 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                     />
                     <div
                         className={cn(
-                            "flex items-center justify-center w-5 h-5 border-2 rounded transition-all",
-                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-gray-500 group-hover:border-accent'
+                            "flex items-center justify-center w-6 h-6 border-2 rounded-md transition-all",
+                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-gray-600 group-hover:border-accent'
                         )}
                     >
                         {isChecked && <Check className="w-4 h-4 text-gray-900" />}
@@ -50,9 +49,8 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                 </div>
 
                 <div className="flex-1">
-                     <div className="flex justify-between items-start mb-2">
+                     <div className="flex justify-between items-center mb-2">
                         <div className="flex flex-col mr-2">
-                           <span className="text-accent text-sm font-bold">Sim, eu quero!</span>
                            <span className="text-white font-semibold text-base leading-tight">{bump.title}</span>
                         </div>
                         <p className="font-bold text-lg text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
@@ -60,7 +58,7 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
 
                     {bump.description && (
                         <div className={cn(
-                            "text-xs text-gray-400 pl-0 mt-2 pt-2",
+                            "text-sm text-gray-400 pl-0 mt-2 pt-2",
                              'border-t border-dashed border-gray-700'
                         )}>
                             {bump.description}
@@ -103,7 +101,7 @@ const PixDisplay: React.FC<{onClose: () => void, pixKey: string, totalPrice: num
             <h2 className="text-xl font-bold text-white mb-4">Pagamento via PIX</h2>
             
             <div style={{ background: 'white', padding: '16px', borderRadius: '8px' }}>
-                <QRCode value={pixKey} size={150} />
+                {pixKey ? <QRCode value={pixKey} size={150} /> : <div className="w-[150px] h-[150px] bg-gray-300 animate-pulse rounded-md" />}
             </div>
 
             <div className="w-full mt-6">
@@ -112,6 +110,7 @@ const PixDisplay: React.FC<{onClose: () => void, pixKey: string, totalPrice: num
                     readOnly 
                     value={pixKey}
                     className="bg-gray-800 border-gray-700 text-white pr-4 truncate text-center font-mono"
+                    placeholder="Gerando código pix..."
                 />
             </div>
             <Button onClick={handleCopy} className="mt-3 w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
@@ -140,8 +139,11 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
   const [view, setView] = useState<'form' | 'pix'>('form');
+  const [pixKey, setPixKey] = useState('');
 
-  const pixKey = "00020126580014br.gov.bcb.pix0136123e4567-e12b-12d1-a456-4266554400005204000053039865802BR5913NOME DO LOJISTA6008BRASILIA62070503***6304E2D3";
+  const API_TOKEN = 'sk_a689a20c480aee9372486cfc6ed7c349ecd7951ce3129f0236adff9a31ee42c7';
+  const PRODUCT_HASH = 'prod_d91a61115c52766b';
+  const API_URL = 'https://multi.paradisepags.com/api/v1/transaction.php';
 
   if (!isOpen) {
     return null;
@@ -160,7 +162,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
     );
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setError('Por favor, insira um e-mail válido.');
@@ -168,17 +170,59 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
     }
     setError('');
     setIsLoading(true);
-    
-    onSubmit(email);
-    
-    setTimeout(() => {
+    setView('pix');
+
+    const payload = {
+        amount: Math.round(totalPrice * 100),
+        description: 'Rico com IA',
+        productHash: PRODUCT_HASH,
+        customer: {
+            name: email.split('@')[0], // Basic name from email
+            email: email,
+        },
+        checkoutUrl: window.location.href,
+        orderbump: [], // Add logic if you use order bumps with hashes
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-API-Key': API_TOKEN,
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Falha ao gerar o PIX.');
+        }
+
+        if (result?.pix?.pix_qr_code) {
+            setPixKey(result.pix.pix_qr_code);
+            onSubmit(email);
+        } else {
+            throw new Error('QR Code PIX não retornado pela API.');
+        }
+
+    } catch (apiError: any) {
+        console.error('API Error:', apiError);
+        setError(apiError.message || 'Não foi possível processar seu pagamento. Tente novamente.');
+        setView('form'); // Go back to form on error
+    } finally {
         setIsLoading(false);
-        setView('pix');
-    }, 1000)
+    }
   };
 
   const handleClose = () => {
       setView('form');
+      setPixKey('');
+      setEmail('');
+      setError('');
+      setSelectedBumps([]);
       onClose();
   }
 
@@ -209,13 +253,12 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                                 <div>
                                     <Label htmlFor="email" className="text-xs font-medium text-gray-400">SEU MELHOR E-MAIL</Label>
                                     <Input type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
-                                    {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
                                 </div>
                             </div>
                         </div>
                         
                         <div className="space-y-4">
-                            <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">Opções Exclusivas</h3>
+                            <h3 className="text-center text-lg font-bold text-accent tracking-wider uppercase">OPÇÕES EXCLUSIVAS</h3>
                             {orderBumps.map((bump) => (
                             <OrderBumpCard
                                     key={bump.id}
@@ -239,6 +282,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                                 </>
                             ) : 'COMPRAR AGORA'}
                             </Button>
+                             {error && <p className="text-red-400 text-sm mt-2 text-center">{error}</p>}
                         </div>
                     </form>
 
