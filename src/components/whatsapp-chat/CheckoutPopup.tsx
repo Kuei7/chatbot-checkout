@@ -17,8 +17,8 @@ interface CheckoutPopupProps {
 }
 
 const orderBumps = [
-    { id: 'bump1', title: 'Acesso a todos os métodos de ganhar dinheiro', price: 19.90, description: 'Aqui eu vou liberar todos os métodos que eu conheço de ganhar dinheiro na internet, e você vai receber todos os que lançarem daqui para frente também.' },
-    { id: 'bump2', title: 'Acesso vitalício!', price: 9.90, description: 'Receba acesso vitalício ao método.' }
+    { id: 'bump1', title: 'Sim, eu quero!', subtitle: 'Acesso a todos os métodos de ganhar dinheiro', price: 19.90, description: 'Aqui eu vou liberar todos os métodos que eu conheço de ganhar dinheiro na internet, e você vai receber todos os que lançarem daqui para frente também.', offerHash: 'offer_5a507a2745a74e57' },
+    { id: 'bump2', title: 'Sim, eu quero!', subtitle: 'Acesso vitalício!', price: 9.90, description: 'Receba acesso vitalício ao método.', offerHash: 'offer_f8435d836371c19b' }
 ];
 
 const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: (checked: boolean) => void }> = ({ bump, isChecked, onCheckedChange }) => {
@@ -26,8 +26,8 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
         <div
             onClick={() => onCheckedChange(!isChecked)}
             className={cn(
-                "bg-gray-800/50 rounded-xl p-4 border-2 transition-all cursor-pointer",
-                isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-gray-700 hover:border-accent/50'
+                "bg-[#2C2C40] rounded-xl p-5 border-2 transition-all cursor-pointer",
+                isChecked ? 'border-accent shadow-lg shadow-accent/20' : 'border-[#444466] hover:border-accent/50'
             )}
         >
             <div className="flex items-start">
@@ -40,8 +40,8 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                     />
                     <div
                         className={cn(
-                            "flex items-center justify-center w-6 h-6 border-2 rounded-md transition-all",
-                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-gray-600 group-hover:border-accent'
+                            "flex items-center justify-center w-5 h-5 border-2 rounded-md transition-all",
+                            isChecked ? 'bg-accent border-accent' : 'bg-transparent border-accent'
                         )}
                     >
                         {isChecked && <Check className="w-4 h-4 text-gray-900" />}
@@ -49,16 +49,17 @@ const OrderBumpCard: React.FC<{ bump: any; isChecked: boolean; onCheckedChange: 
                 </div>
 
                 <div className="flex-1">
-                     <div className="flex justify-between items-center mb-2">
+                     <div className="flex justify-between items-start mb-2">
                         <div className="flex flex-col mr-2">
-                           <span className="text-white font-semibold text-base leading-tight">{bump.title}</span>
+                           <span className="text-accent font-semibold text-sm leading-tight">{bump.title}</span>
+                           <span className="text-white font-bold text-base leading-tight mt-1">{bump.subtitle}</span>
                         </div>
                         <p className="font-bold text-lg text-accent whitespace-nowrap ml-3">+ R$ {bump.price.toFixed(2).replace('.', ',')}</p>
                     </div>
 
                     {bump.description && (
                         <div className={cn(
-                            "text-sm text-gray-400 pl-0 mt-2 pt-2",
+                            "text-sm text-gray-400 pl-0 mt-3 pt-3",
                              'border-t border-dashed border-gray-700'
                         )}>
                             {bump.description}
@@ -172,16 +173,21 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
     setIsLoading(true);
     setView('pix');
 
+    const bumpsToSend = selectedBumps.map(bumpId => {
+        const bump = orderBumps.find(b => b.id === bumpId);
+        return bump?.offerHash;
+    }).filter(Boolean) as string[];
+
     const payload = {
-        amount: Math.round(totalPrice * 100),
+        amount: Math.round(basePrice * 100),
         description: 'Rico com IA',
         productHash: PRODUCT_HASH,
         customer: {
-            name: email.split('@')[0], // Basic name from email
+            name: email.split('@')[0], 
             email: email,
         },
         checkoutUrl: window.location.href,
-        orderbump: [], // Add logic if you use order bumps with hashes
+        orderbump: bumpsToSend,
     };
 
     try {
@@ -198,6 +204,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
         const result = await response.json();
 
         if (!response.ok) {
+            console.error('API Error Response:', result);
             throw new Error(result.message || 'Falha ao gerar o PIX.');
         }
 
@@ -253,6 +260,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                                 <div>
                                     <Label htmlFor="email" className="text-xs font-medium text-gray-400">SEU MELHOR E-MAIL</Label>
                                     <Input type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-gray-700 border-gray-600 text-white" />
+                                    {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
                                 </div>
                             </div>
                         </div>
