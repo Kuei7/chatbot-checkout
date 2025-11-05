@@ -77,7 +77,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="p-5 rounded-lg bg-gray-800/50">
+                    <div className="bg-gray-800/50 rounded-lg p-5">
                         <h3 className="font-bold text-lg mb-4 flex items-center"><span className="bg-accent text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold mr-2">1</span> DADOS PESSOAIS</h3>
                         <div className="space-y-4">
                              <div>
@@ -88,18 +88,20 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                         </div>
                     </div>
                     
-                    <div className="space-y-3">
-                        <p className="text-center font-semibold">Turbine sua compra com um <span className="text-accent">desconto exclusivo</span>:</p>
+                    <div className="space-y-4">
+                        <h3 className="text-center font-bold text-accent">OPÇÕES EXCLUSIVAS</h3>
                         {orderBumps.map(bump => (
-                            <div key={bump.id} className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-3 flex items-start gap-3 has-[:checked]:border-accent transition-all">
-                                <Checkbox id={bump.id} onCheckedChange={() => handleBumpChange(bump.id)} className="mt-1 size-5 border-gray-500 data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground data-[state=checked]:border-accent" />
+                            <div key={bump.id} className="bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg p-4 flex items-start gap-4 has-[:checked]:border-accent transition-all">
+                                <Checkbox id={bump.id} onCheckedChange={() => handleBumpChange(bump.id)} className="mt-1 size-6 border-gray-500 data-[state=checked]:bg-accent data-[state=checked]:text-primary-foreground data-[state=checked]:border-accent" />
                                 <Label htmlFor={bump.id} className="flex-1 cursor-pointer">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-semibold text-red-500">Sim, eu quero!</span>
-                                        <span className="font-bold text-accent">+ R$ {bump.price.toFixed(2).replace('.',',')}</span>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-semibold text-accent">Sim, eu quero!</p>
+                                            <p className="font-bold text-white">{bump.title}</p>
+                                        </div>
+                                        <p className="font-bold text-accent whitespace-nowrap">+ R$ {bump.price.toFixed(2).replace('.',',')}</p>
                                     </div>
-                                    <p className="font-bold text-white">{bump.title}</p>
-                                    <p className="text-xs text-gray-400 mt-1">{bump.description}</p>
+                                    <p className="text-sm text-gray-400 mt-2">{bump.description}</p>
                                 </Label>
                             </div>
                         ))}
