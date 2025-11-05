@@ -71,8 +71,7 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
                         <Image src="https://s3.typebot.io/public/workspaces/cm8gbxl5b000ba3ncy4y16grd/typebots/cmh096k1s0001k404bj3cxex3/blocks/t6whk2rk3yrzzm8zwiaf6wt0?v=1761822488273" alt="Chapeu Preto" width={60} height={60} className="rounded-md bg-gray-800" data-ai-hint="man anonymous"/>
                         <div>
                             <h3 className="font-bold text-lg text-white">Chapéu Preto (10k por mês)</h3>
-                            <p className="text-2xl font-bold text-accent">3x R$ 7,22</p>
-                            <p className="text-xs text-gray-400">Ou R$ 19,90 à vista</p>
+                            <p className="text-2xl font-bold text-accent">R$ 19,90</p>
                         </div>
                     </div>
                 </div>
