@@ -15,8 +15,8 @@ interface CheckoutPopupProps {
 }
 
 const orderBumps = [
-    { id: 'bump1', title: 'Grupo VIP + Acesso Antecipado', price: 9.90, description: 'Participe do nosso grupo exclusivo e receba atualizações antes de todo mundo.' },
-    { id: 'bump2', title: 'Pack de Ferramentas IA', price: 14.90, description: 'Um conjunto de ferramentas para potencializar ainda mais seus resultados.' }
+    { id: 'bump1', title: 'Acesso a todos os métodos de ganhar dinheiro', price: 19.90, description: 'Aqui eu vou liberar todos os metodos que eu conheço de ganhar dinheiro na internet, e você vai receber todos os que lançarem daqui para frente tambem' },
+    { id: 'bump2', title: 'Acesso vitalício!', price: 9.90, description: 'Receba acesso vitalício ao método.' }
 ];
 
 const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -64,8 +64,8 @@ const CheckoutPopup: React.FC<CheckoutPopupProps> = ({ isOpen, onClose, onSubmit
           <X size={24} />
         </button>
         
-        <header className="bg-background/50 text-center py-4 rounded-t-lg">
-          <h2 className="text-lg font-semibold">Compra Segura e Rápida</h2>
+        <header className="bg-header-background text-center py-4 rounded-t-lg">
+          <h2 className="text-lg font-semibold text-primary-foreground">Compra Segura e Rápida</h2>
         </header>
 
         <div className="p-6">
