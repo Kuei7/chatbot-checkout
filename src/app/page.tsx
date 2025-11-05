@@ -8,6 +8,7 @@ import ChatMessages from '@/components/whatsapp-chat/ChatMessages';
 import ActionButtons from '@/components/whatsapp-chat/ActionButtons';
 import { updateLeadProgress } from '@/services/leadService';
 import { v4 as uuidv4 } from 'uuid';
+import CheckoutPopup from '@/components/whatsapp-chat/CheckoutPopup';
 
 
 const getUserId = () => {
@@ -25,6 +26,7 @@ export default function Home() {
     const [currentStep, setCurrentStep] = useState(0);
     const [status, setStatus] = useState('Online');
     const [activeButtons, setActiveButtons] = useState<ScriptItem['buttons']>([]);
+    const [isCheckoutOpen, setCheckoutOpen] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const userIdRef = useRef<string | null>(null);
 
@@ -90,6 +92,11 @@ export default function Home() {
             window.location.href = button.url;
             return;
         }
+        
+        if (button.action === 'checkout') {
+            setCheckoutOpen(true);
+            return;
+        }
 
         const userMessage: DisplayMessage = {
             id: `user-${Date.now()}`,
@@ -103,23 +110,43 @@ export default function Home() {
         setActiveButtons([]);
         setCurrentStep((prev) => prev + 1);
     };
+    
+    const handleCheckoutSubmit = (email: string) => {
+        if(userIdRef.current) {
+            updateLeadProgress(userIdRef.current, 'group7', email);
+        }
+        console.log('Checkout submitted with email:', email);
+        // Here you would typically handle the payment processing
+        
+        // For demonstration, redirect after "payment"
+        setTimeout(() => {
+            window.location.href = 'https://go.pepperpay.com.br/0qvu6';
+        }, 1000);
+    };
 
     return (
-        <main 
-            className="flex flex-col h-screen max-h-screen overflow-hidden"
-            style={{ 
-                backgroundImage: 'url(https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/rmkt86vk7r985fy1ekip6xvp?v=1754527793735)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        >
-            <WhatsappHeader status={status} />
-            <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto pb-4">
-                <ChatMessages messages={messages} />
-            </div>
-            {activeButtons.length > 0 && (
-                <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
-            )}
-        </main>
+        <>
+            <main 
+                className="flex flex-col h-screen max-h-screen overflow-hidden"
+                style={{ 
+                    backgroundImage: 'url(https://s3.typebot.io/public/workspaces/cme0in7zf0022jo04wbcry6pa/typebots/vmq15sy6m7awugtgcsxl42dq/blocks/rmkt86vk7r985fy1ekip6xvp?v=1754527793735)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            >
+                <WhatsappHeader status={status} />
+                <div ref={chatContainerRef} className="chat-container flex-1 overflow-y-auto pb-4">
+                    <ChatMessages messages={messages} />
+                </div>
+                {activeButtons.length > 0 && (
+                    <ActionButtons buttons={activeButtons} onButtonClick={handleButtonClick} />
+                )}
+            </main>
+            <CheckoutPopup 
+                isOpen={isCheckoutOpen} 
+                onClose={() => setCheckoutOpen(false)}
+                onSubmit={handleCheckoutSubmit}
+            />
+        </>
     );
 }
