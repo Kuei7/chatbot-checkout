@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import QRCode from 'react-qr-code';
+
 
 interface CheckoutPopupProps {
   isOpen: boolean;
@@ -100,8 +102,8 @@ const PixDisplay: React.FC<{onClose: () => void, pixKey: string, totalPrice: num
         <div className="text-center p-6 flex flex-col items-center bg-gray-900">
             <h2 className="text-xl font-bold text-white mb-4">Pagamento via PIX</h2>
             
-            <div className="p-2 bg-white rounded-lg inline-block">
-                <Image src="https://i.postimg.cc/L8p5g3j2/qr-code-pix.png" alt="PIX QR Code" width={180} height={180} data-ai-hint="QR code" />
+            <div style={{ background: 'white', padding: '16px', borderRadius: '8px' }}>
+                <QRCode value={pixKey} size={150} />
             </div>
 
             <div className="w-full mt-6">
